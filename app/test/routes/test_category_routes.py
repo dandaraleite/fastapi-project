@@ -24,7 +24,7 @@ def test_add_category_route(db_session):
     db_session.commit()
 
 
-def tet_list_categories_route(categories_on_db):
+def test_list_categories_route(categories_on_db):
     response = client.get('/category/list')
 
     assert response.status_code == status.HTTP_200_OK
@@ -36,3 +36,16 @@ def tet_list_categories_route(categories_on_db):
         "slug": categories_on_db[0].slug,
         "id": categories_on_db[0].id,
     }
+
+
+def test_delete_category_route(db_session):
+    category_model = CategoryModel(name='Roupa', slug='roupa')
+    db_session.add(category_model)
+    db_session.commit()
+
+    response = client.delete(f'/category/delete/{category_model.id}')
+
+    assert response.status_code == status.HTTP_200_OK
+
+    category_model = db_session.query(CategoryModel).filter_by(id=category_model.id).first()
+    assert category_model is None
